@@ -15,9 +15,14 @@ public class PipeEvent implements Serializable {
 	private static final long serialVersionUID = -408680655594266957L;
 
 	private transient byte[] bytes;
+	private boolean isSendRemote;
 
-	public PipeEvent(byte[] bytes) {
+	public PipeEvent() {
+	}
+
+	public PipeEvent(byte[] bytes, boolean isSendRemote) {
 		this.setBytes(bytes);
+		this.setSendRemote(isSendRemote);
 	}
 
 	public byte[] getBytes() {
@@ -26,6 +31,14 @@ public class PipeEvent implements Serializable {
 
 	public void setBytes(byte[] bytes) {
 		this.bytes = bytes;
+	}
+
+	public boolean isSendRemote() {
+		return isSendRemote;
+	}
+
+	public void setSendRemote(boolean isSendRemote) {
+		this.isSendRemote = isSendRemote;
 	}
 
 }

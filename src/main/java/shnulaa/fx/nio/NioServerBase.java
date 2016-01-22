@@ -29,7 +29,7 @@ import shnulaa.fx.message.MessageOutputImpl;
  * @author liuyq
  *
  */
-public abstract class NioServerBase implements IServer {
+public abstract class NioServerBase implements ISocketHandler, IServer {
 
 	/** the instance of log **/
 	private static Logger log = LoggerFactory.getLogger(NioServerBase.class);
@@ -140,6 +140,47 @@ public abstract class NioServerBase implements IServer {
 			log.error("decode ByteBuffer error..", ex);
 			throw new NioException("decode ByteBuffer error..", ex);
 		}
+	}
+
+	protected byte[] decode(ByteBuffer readBuffer) {
+		try {
+			readBuffer.flip(); // flip the buffer for reading
+			byte[] bytes = new byte[readBuffer.remaining()]; // create a byte
+																// array
+																// the length of
+																// the
+																// number of
+																// bytes
+																// written to
+																// the
+																// buffer
+			readBuffer.get(bytes); // read the bytes that were written
+			return bytes;
+		} catch (Exception ex) {
+			log.error("decode ByteBuffer error..", ex);
+			throw new NioException("decode ByteBuffer error..", ex);
+		}
+	}
+
+	protected void cleanUp(SocketChannel socketChannel) {
+		try {
+			socketChannel.close();
+		} catch (IOException e) {
+			log.info("IOException occurred when close socketChannel.", e);
+		}
+		SelectionKey key = socketChannel.keyFor(selector);
+		if (key != null) {
+			key.cancel();
+		}
+
+		if (pendingData.containsKey(socketChannel)) {
+			pendingData.remove(socketChannel);
+		}
+	}
+
+	@Override
+	public void stop() {
+
 	}
 
 }
