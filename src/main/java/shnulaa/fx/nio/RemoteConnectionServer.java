@@ -182,8 +182,6 @@ public class RemoteConnectionServer extends NioServerBase {
 
 	@Override
 	protected void stopServer() {
-		// TODO Auto-generated method stub
-		
 	}
 
 }
