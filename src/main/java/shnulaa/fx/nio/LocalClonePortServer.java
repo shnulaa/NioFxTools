@@ -2,18 +2,22 @@ package shnulaa.fx.nio;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import shnulaa.fx.config.Config;
 import shnulaa.fx.exception.NioException;
+import shnulaa.fx.message.MessageOutputImpl;
 import shnulaa.fx.pool.Executor;
+import shnulaa.fx.util.Collections3;
 
 /**
  * 
@@ -24,15 +28,15 @@ public class LocalClonePortServer extends NioServerBase {
 
 	private static Logger log = LoggerFactory.getLogger(LocalClonePortServer.class);
 
-	private final Config config;
 	private ServerSocketChannel server;
 	private RemoteConnectionServer remoteServer;
 	private final Executor executor;
 
-	public LocalClonePortServer(Config config) {
-		this.config = config;
-		this.remoteServer = new RemoteConnectionServer(config);
+	public LocalClonePortServer(MessageOutputImpl output, Config config) {
+		super(output, config);
 		this.executor = Executor.getInstance();
+		this.remoteServer = new RemoteConnectionServer(output, config);
+		this.executor.execute(this.remoteServer);
 	}
 
 	@Override
@@ -40,6 +44,7 @@ public class LocalClonePortServer extends NioServerBase {
 		try {
 			this.server = SelectorProvider.provider().openServerSocketChannel();
 			server.bind(new InetSocketAddress(config.getLocalPort()));
+			server.configureBlocking(false);
 			Selector selector = Selector.open();
 			server.register(selector, SelectionKey.OP_ACCEPT);
 			return selector;
@@ -80,47 +85,75 @@ public class LocalClonePortServer extends NioServerBase {
 		}
 	}
 
-	private void accept(SelectionKey key) {
-		try {
-			ServerSocketChannel server = (ServerSocketChannel) key.channel();
-			server.configureBlocking(false);
-			SocketChannel sc = server.accept();
-			sc.register(selector, SelectionKey.OP_READ);
-			// create PipeWorker instance and
-			// create socket channel to connect remote
-			PipeWorker worker = remoteServer.createPipeWorker(this, sc);
-			executor.execute(worker);
-		} catch (IOException e) {
-			log.error("IOException occurred when accept the SocketChannel", e);
-		}
+	private void accept(SelectionKey key) throws IOException {
+		log.info("Ready to accept the client with local Clone Server selectKey..");
+		ServerSocketChannel server = (ServerSocketChannel) key.channel();
+		SocketChannel sc = server.accept();
+		sc.configureBlocking(false);
+		sc.register(selector, SelectionKey.OP_READ);
+
+		createWriteBuffer(sc);
+
+		// create PipeWorker instance and
+		// create socket channel to connect remote
+		PipeWorker worker = remoteServer.createPipeWorker(this, sc);
+		pipes.put(sc, worker);
+		executor.execute(worker);
 	}
 
-	private void read(SelectionKey key) {
-		try {
-			SocketChannel sc = (SocketChannel) key.channel();
+	private void read(SelectionKey key) throws IOException {
+		log.info("Ready to read from client SocketChannel with local Clone Server selectKey..");
+		SocketChannel sc = (SocketChannel) key.channel();
 
-			int read = sc.read(readBuffer);
-			if (read <= 0) {
-				log.warn("");
-				cleanUp(sc);
-				return;
-			}
-
-			byte[] bytes = decode(readBuffer);
-			if (bytes == null) {
-				log.error("");
-				cleanUp(sc);
-				return;
-			}
-
-		} catch (IOException e) {
-			log.error("IOException occurred when read data from local..", e);
+		PipeWorker pipe = pipes.get(sc);
+		if (pipe == null) {
+			log.error("fetch null from pipes map..");
+			cleanUp(sc);
+			return;
 		}
 
+		// clear read buffer for new data
+		readBuffer.clear();
+
+		int readCount = sc.read(readBuffer);
+		if (readCount == -1) {
+			log.warn("read from channel result less than 0..");
+			cleanUp(sc);
+			return;
+		}
+
+		byte[] bytes = decode(readBuffer);
+		if (bytes == null || bytes.length <= 0) {
+			log.error("decode the BytesBuffer result is incorrect..");
+			cleanUp(sc);
+			return;
+		}
+
+		pipe.progressEvent(bytes, readCount, true);
 	}
 
-	private void write(SelectionKey key) {
-
+	private void write(SelectionKey key) throws IOException {
+		log.info("Ready to write into client SocketChannel with local Clone Server selectKey..");
+		SocketChannel sc = (SocketChannel) key.channel();
+		List<ByteBuffer> queue = pendingData.get(sc);
+		if (queue != null) {
+			synchronized (queue) {
+				while (!queue.isEmpty()) {
+					ByteBuffer buffer = Collections3.getFirst(queue);
+					sc.write(buffer);
+					// log.info(decode(buffer, true));
+					if (buffer.hasRemaining()) {
+						break;
+					}
+					queue.remove(buffer);
+				}
+				if (queue.isEmpty()) {
+					key.interestOps(SelectionKey.OP_READ);
+				}
+			}
+		} else {
+			log.warn("queue is null while write the ByteBuffer to channel..");
+		}
 	}
 
 	@Override
@@ -131,13 +164,4 @@ public class LocalClonePortServer extends NioServerBase {
 	public void stop() {
 	}
 
-	@Override
-	public void send(ChangeRequest request, byte[] data) {
-
-	}
-
-	@Override
-	public void send(ChangeRequest request) {
-
-	}
 }

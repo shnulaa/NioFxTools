@@ -7,13 +7,17 @@
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="176.0" prefWidth="349.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="shnulaa.fx.controller.MainLayoutController">
    <children>
-      <Button fx:id="listen" layoutX="14.0" layoutY="136.0" mnemonicParsing="false" onAction="#handleListen" text="克隆" />
-      <Label fx:id="listenLab" layoutX="13.0" layoutY="17.0" text="原始端口" />
-      <TextField fx:id="listenPort" layoutX="70.0" layoutY="13.0" prefHeight="25.0" prefWidth="48.0" />
-      <TextArea fx:id="listenArea" layoutX="124.0" layoutY="13.0" prefHeight="107.0" prefWidth="209.0" />
-      <Button fx:id="stop" layoutX="63.0" layoutY="136.0" mnemonicParsing="false" onAction="#handleStop" text="停止" />
-      <Button fx:id="clear" layoutX="115.0" layoutY="136.0" mnemonicParsing="false" onAction="#handleClear" text="清空" />
-      <Label fx:id="listenLab1" layoutX="14.0" layoutY="50.0" text="原始端口" />
-      <TextField fx:id="listenPort1" layoutX="71.0" layoutY="46.0" prefHeight="25.0" prefWidth="48.0" />
+      <Button fx:id="listen" layoutX="14.0" layoutY="149.0" mnemonicParsing="false" onAction="#handleListen" text="克隆" />
+      <Label fx:id="localIpLab" layoutX="13.0" layoutY="17.0" text="原始地址" />
+      <TextField fx:id="localIp" layoutX="70.0" layoutY="13.0" prefHeight="25.0" prefWidth="48.0" />
+      <TextArea fx:id="listenArea" layoutX="124.0" layoutY="13.0" prefHeight="124.0" prefWidth="209.0" />
+      <Button fx:id="stop" layoutX="63.0" layoutY="149.0" mnemonicParsing="false" onAction="#handleStop" text="停止" />
+      <Button fx:id="clear" layoutX="115.0" layoutY="149.0" mnemonicParsing="false" onAction="#handleClear" text="清空" />
+      <Label fx:id="localPortLab" layoutX="14.0" layoutY="50.0" text="原始端口" />
+      <TextField fx:id="localPort" layoutX="71.0" layoutY="46.0" prefHeight="25.0" prefWidth="48.0" />
+      <Label fx:id="remoteIpLab" layoutX="13.0" layoutY="81.0" text="远程地址" />
+      <TextField fx:id="remoteIp" layoutX="70.0" layoutY="77.0" prefHeight="25.0" prefWidth="48.0" />
+      <Label fx:id="remotePortLab" layoutX="14.0" layoutY="114.0" text="远程端口" />
+      <TextField fx:id="remotePort" layoutX="71.0" layoutY="110.0" prefHeight="25.0" prefWidth="48.0" />
    </children>
 </Pane>

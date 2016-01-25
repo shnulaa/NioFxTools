@@ -1,5 +1,6 @@
 package shnulaa.fx.nio;
 
+import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.BlockingQueue;
 
@@ -45,10 +46,14 @@ public class PipeWorker implements Runnable {
 	public PipeWorker() {
 	}
 
-	public void progressEvent(byte[] bytes, boolean isSendRemote) {
-		PipeEvent event = (bytes == null) ? new PipeEvent() : new PipeEvent(bytes, isSendRemote);
+	public void progressEvent(byte[] bytes, int readCount, boolean isSendRemote) {
+		PipeEvent event = new PipeEvent();
+		if (bytes != null) {
+			byte[] bytesClone = new byte[readCount];
+			System.arraycopy(bytes, 0, bytesClone, 0, readCount);
+			event = new PipeEvent(bytesClone, isSendRemote);
+		}
 		progressQueue.add(event);
-
 	}
 
 	@Override
@@ -76,10 +81,13 @@ public class PipeWorker implements Runnable {
 				}
 
 				final boolean isSendRemote = event.isSendRemote();
-				ISocketHandler handler = (isSendRemote) ? localHandler : remoteHandler;
-				SocketChannel channel = (isSendRemote) ? localChannel : remoteChannel;
+				ISocketHandler handler = (isSendRemote) ? remoteHandler : localHandler;
+				SocketChannel channel = (isSendRemote) ? remoteChannel : localChannel;
 
-				handler.send(new ChangeRequest(channel, ChangeRequest.CHANGE_SOCKET_OP), bytes);
+				log.info("Ready to send the change request, direction: {}",
+						isSendRemote ? "(local port) -> (remote port)" : "(remote port) -> (local port)");
+
+				handler.send(new ChangeRequest(channel, ChangeRequest.CHANGE_SOCKET_OP, SelectionKey.OP_WRITE), bytes);
 			} catch (InterruptedException e) {
 				log.error("InterruptedException is occurred when pipe the local and remote..", e);
 			} catch (Exception e) {

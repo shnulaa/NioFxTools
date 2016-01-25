@@ -10,7 +10,6 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -19,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import shnulaa.fx.config.Config;
 import shnulaa.fx.constant.Constant;
 import shnulaa.fx.exception.NioException;
 import shnulaa.fx.message.MessageOutputImpl;
@@ -33,16 +33,18 @@ public abstract class NioServerBase implements ISocketHandler, IServer {
 
 	/** the instance of log **/
 	private static Logger log = LoggerFactory.getLogger(NioServerBase.class);
-	protected int port;
 	protected Selector selector;
+	protected Config config;
 
 	protected MessageOutputImpl messageOutputImpl;
 	protected ByteBuffer readBuffer = ByteBuffer.allocate(Constant.BUFFER_SIZE);
 	private volatile boolean isRunning = true;
 
-	private Map<SocketChannel, Queue<PipeEvent>> pendingData = Maps.newConcurrentMap();
+	protected Map<SocketChannel, List<ByteBuffer>> pendingData = Maps.newConcurrentMap();
 
-	private List<ChangeRequest> pendingRequests = Lists.newArrayList();
+	protected List<ChangeRequest> pendingRequests = Lists.newArrayList();
+
+	protected Map<SocketChannel, PipeWorker> pipes = Maps.newConcurrentMap();
 
 	protected abstract Selector initSelector();
 
@@ -55,9 +57,9 @@ public abstract class NioServerBase implements ISocketHandler, IServer {
 	public NioServerBase() {
 	}
 
-	public NioServerBase(MessageOutputImpl output, int port) {
+	public NioServerBase(MessageOutputImpl output, Config config) {
 		this();
-		this.port = port;
+		this.config = config;
 		this.messageOutputImpl = output;
 		this.selector = initSelector();
 	}
@@ -79,11 +81,7 @@ public abstract class NioServerBase implements ISocketHandler, IServer {
 					}
 				}
 
-				int r = selector.select();
-				if (r <= 0) {
-					log.warn("selector.select() ret <= 0");
-					continue;
-				}
+				selector.select();
 
 				Iterator<SelectionKey> it = selector.selectedKeys().iterator();
 				while (it.hasNext()) {
@@ -119,6 +117,15 @@ public abstract class NioServerBase implements ISocketHandler, IServer {
 
 	protected void outPut(String message, boolean withSplit) {
 		this.messageOutputImpl.output(message, withSplit);
+	}
+
+	protected void createWriteBuffer(SocketChannel socketChannel) {
+		List<ByteBuffer> queue = Lists.newArrayList();
+		Object put;
+		put = pendingData.putIfAbsent(socketChannel, queue);
+		if (put != null) {
+			log.warn("Dup write buffer creation: " + socketChannel);
+		}
 	}
 
 	protected String decode(ByteBuffer readBuffer, boolean ignoreBr) {
@@ -180,6 +187,37 @@ public abstract class NioServerBase implements ISocketHandler, IServer {
 
 	@Override
 	public void stop() {
+
+	}
+
+	@Override
+	public void send(ChangeRequest request, byte[] data) {
+		switch (request.type) {
+		case ChangeRequest.CHANGE_SOCKET_OP:
+			SocketChannel sc = request.socket;
+			List<ByteBuffer> queue = pendingData.get(sc);
+			if (queue != null) {
+				synchronized (queue) {
+					queue.add(ByteBuffer.wrap(data));
+				}
+			} else {
+				log.warn("pendingData is not ready to send..");
+			}
+			break;
+		default:
+			log.warn("ChangeRequest operation is not support for send..");
+			break;
+		}
+
+		synchronized (pendingRequests) {
+			pendingRequests.add(request);
+		}
+
+		selector.wakeup();
+	}
+
+	@Override
+	public void send(ChangeRequest request) {
 
 	}
 
