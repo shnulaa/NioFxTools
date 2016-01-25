@@ -1,5 +1,6 @@
 package shnulaa.fx.nio;
 
+import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.BlockingQueue;
@@ -46,16 +47,6 @@ public class PipeWorker implements Runnable {
 	public PipeWorker() {
 	}
 
-	public void progressEvent(byte[] bytes, int readCount, boolean isSendRemote) {
-		PipeEvent event = new PipeEvent();
-		if (bytes != null) {
-			byte[] bytesClone = new byte[readCount];
-			System.arraycopy(bytes, 0, bytesClone, 0, readCount);
-			event = new PipeEvent(bytesClone, isSendRemote);
-		}
-		progressQueue.add(event);
-	}
-
 	@Override
 	public void run() {
 		final Thread t = Thread.currentThread();
@@ -73,6 +64,11 @@ public class PipeWorker implements Runnable {
 
 			try {
 				final PipeEvent event = progressQueue.take();
+				if (event == null) {
+					log.warn("event is null when fetch from the progressQueue, break..");
+					break;
+				}
+
 				log.debug("catch pipe event successfully.");
 				byte[] bytes = event.getBytes();
 				if (bytes == null) {
@@ -96,5 +92,36 @@ public class PipeWorker implements Runnable {
 			}
 		}
 
+	}
+
+	public void close() {
+		if (localChannel != null && localChannel.isOpen()) {
+			try {
+				localChannel.close();
+			} catch (IOException e) {
+				log.error("IOException occurred when close the localChannel..");
+			}
+		}
+
+		if (remoteChannel != null && remoteChannel.isOpen()) {
+			try {
+				remoteChannel.close();
+			} catch (IOException e) {
+				log.error("IOException occurred when close the remoteChannel..");
+			}
+		}
+
+		requestClose = true;
+		progressEvent(null, 0, false);
+	}
+
+	public void progressEvent(byte[] bytes, int readCount, boolean isSendRemote) {
+		PipeEvent event = new PipeEvent();
+		if (bytes != null) {
+			byte[] bytesClone = new byte[readCount];
+			System.arraycopy(bytes, 0, bytesClone, 0, readCount);
+			event = new PipeEvent(bytesClone, isSendRemote);
+		}
+		progressQueue.add(event);
 	}
 }

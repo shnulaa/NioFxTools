@@ -148,10 +148,6 @@ public class RemoteConnectionServer extends NioServerBase {
 
 	}
 
-	@Override
-	protected void stopServer() {
-	}
-
 	/**
 	 * 
 	 * @param localHandler
@@ -182,6 +178,12 @@ public class RemoteConnectionServer extends NioServerBase {
 			log.error(error, e);
 			throw new NioException(error, e);
 		}
+	}
+
+	@Override
+	protected void stopServer() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

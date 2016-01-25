@@ -129,24 +129,8 @@ public abstract class NioServerBase implements ISocketHandler, IServer {
 	}
 
 	protected String decode(ByteBuffer readBuffer, boolean ignoreBr) {
-		try {
-			readBuffer.flip(); // flip the buffer for reading
-			byte[] bytes = new byte[readBuffer.remaining()]; // create a byte
-																// array
-																// the length of
-																// the
-																// number of
-																// bytes
-																// written to
-																// the
-																// buffer
-			readBuffer.get(bytes); // read the bytes that were written
-			String packet = new String(bytes, Constant.CHARSET);
-			return ignoreBr ? packet.replaceAll("\n", StringUtils.EMPTY) : packet;
-		} catch (Exception ex) {
-			log.error("decode ByteBuffer error..", ex);
-			throw new NioException("decode ByteBuffer error..", ex);
-		}
+		String packet = new String(decode(readBuffer), Constant.CHARSET);
+		return ignoreBr ? packet.replaceAll("\n", StringUtils.EMPTY) : packet;
 	}
 
 	protected byte[] decode(ByteBuffer readBuffer) {
@@ -187,7 +171,20 @@ public abstract class NioServerBase implements ISocketHandler, IServer {
 
 	@Override
 	public void stop() {
+		isRunning = false;
 
+		for (PipeWorker worker : pipes.values()) {
+			worker.close();
+		}
+		pipes.clear();
+
+		try {
+			selector.close();
+		} catch (IOException e) {
+			log.error("IOException occurred when close the selector..");
+		}
+
+		stopServer();
 	}
 
 	@Override

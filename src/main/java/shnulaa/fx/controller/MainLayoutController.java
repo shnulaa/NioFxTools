@@ -105,7 +105,10 @@ public class MainLayoutController {
 			log.error("Exception occurred when execute the LocalNioServer..", ex);
 			showAlert(Constant.TITLE, (ex instanceof NumberFormatException) ? "Port is not number.." : ex.getMessage(),
 					Alert.AlertType.ERROR);
+			return;
 		}
+
+		outputImpl.output("Clone port successfully..", true);
 	}
 
 	/**
@@ -113,6 +116,13 @@ public class MainLayoutController {
 	 */
 	@FXML
 	private void handleStop() {
+		stop();
+	}
+
+	/**
+	 * stop
+	 */
+	public void stop() {
 		try {
 			log.debug("Read to Shutdown the service..");
 			if (base != null) {

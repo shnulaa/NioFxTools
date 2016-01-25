@@ -158,10 +158,18 @@ public class LocalClonePortServer extends NioServerBase {
 
 	@Override
 	protected void stopServer() {
-	}
+		if (remoteServer != null) {
+			remoteServer.stop();
+		}
 
-	@Override
-	public void stop() {
+		if (server != null) {
+			try {
+				server.close();
+			} catch (IOException e) {
+				log.error("IOException occurred when close the server..");
+			}
+		}
+
 	}
 
 }

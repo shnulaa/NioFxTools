@@ -28,17 +28,17 @@ public class Executor {
 	/**
 	 * Default name prefix for the thread name
 	 */
-	private String namePrefix = "Sync-data-";
+	private String namePrefix = "Pipe-Worker-";
 
 	/**
 	 * max number of threads
 	 */
-	private int maxThreads = 10;
+	private int maxThreads = 20;
 
 	/**
 	 * min number of threads
 	 */
-	private int minSpareThreads = 6;
+	private int minSpareThreads = 20;
 
 	/**
 	 * idle time in milliseconds
@@ -53,7 +53,7 @@ public class Executor {
 	/**
 	 * prestart threads?
 	 */
-	private boolean prestartminSpareThreads = true;
+	private boolean prestartminSpareThreads = false;
 
 	/**
 	 * the default constructor
