@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import shnulaa.fx.config.Config;
@@ -25,28 +24,25 @@ public class MainLayoutController {
 	private static Logger log = LoggerFactory.getLogger(MainLayoutController.class);
 
 	@FXML
-	private TextField localIp;
+	private TextField localIp; // local IP address
 
 	@FXML
-	private TextField localPort;
+	private TextField localPort; // local port
 
 	@FXML
-	private TextField remoteIp;
+	private TextField remoteIp; // remote IP address
 
 	@FXML
-	private TextField remotePort;
+	private TextField remotePort; // remote port
 
 	@FXML
-	private Label listenLab;
+	private Button listen; // the clone button
 
 	@FXML
-	private Button listen;
+	private Button stop; // stop button
 
 	@FXML
-	private Button stop;
-
-	@FXML
-	private Button clear;
+	private Button clear; // the clear button
 
 	@FXML
 	private TextArea listenArea;
@@ -171,6 +167,10 @@ public class MainLayoutController {
 		a.showAndWait();
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	private Config createConfig() {
 		String localIpText = localIp.getText();
 		if (StringUtils.isEmpty(localIpText)) {

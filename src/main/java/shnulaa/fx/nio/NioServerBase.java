@@ -22,6 +22,7 @@ import shnulaa.fx.config.Config;
 import shnulaa.fx.constant.Constant;
 import shnulaa.fx.exception.NioException;
 import shnulaa.fx.message.MessageOutputImpl;
+import shnulaa.fx.pool.Executor;
 
 /**
  * NioServerBase
@@ -183,6 +184,8 @@ public abstract class NioServerBase implements ISocketHandler, IServer {
 		} catch (IOException e) {
 			log.error("IOException occurred when close the selector..");
 		}
+
+		Executor.getInstance().stopInternal();
 
 		stopServer();
 	}
