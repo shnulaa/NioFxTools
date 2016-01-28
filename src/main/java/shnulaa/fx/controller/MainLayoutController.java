@@ -51,7 +51,7 @@ public class MainLayoutController {
 	private ExecutorService service;
 
 	/** the worker of local Nio server, use for shutdown the server **/
-	private IServer base;
+	private IServer server;
 
 	/** use for output the message in textArea **/
 	private MessageOutputImpl outputImpl;
@@ -87,12 +87,10 @@ public class MainLayoutController {
 			if (config == null) {
 				throw new RuntimeException("");
 			}
-			// log.debug("Start Local service and ready to listen port: {}..",
-			// port);
 			service = Executors.newSingleThreadExecutor();
 
-			base = new LocalClonePortServer(outputImpl, config);
-			service.execute(base);
+			server = new LocalClonePortServer(outputImpl, config);
+			service.execute(server);
 
 			listen.setDisable(true);
 			stop.setDisable(false);
@@ -103,7 +101,6 @@ public class MainLayoutController {
 					Alert.AlertType.ERROR);
 			return;
 		}
-
 		outputImpl.output("Clone port successfully..", true);
 	}
 
@@ -121,8 +118,8 @@ public class MainLayoutController {
 	public void stop() {
 		try {
 			log.debug("Read to Shutdown the service..");
-			if (base != null) {
-				base.stop();
+			if (server != null) {
+				server.stop();
 			}
 
 			if (service != null) {
@@ -134,7 +131,6 @@ public class MainLayoutController {
 			stop.setDisable(true);
 
 			log.debug("Shutdown the service successfully..");
-
 		} catch (Exception ex) {
 			log.error("Exception occurred when handleStop", ex);
 		} finally {
