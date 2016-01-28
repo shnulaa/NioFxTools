@@ -1,0 +1,4 @@
+# PortCloneFx
+
+
+mvn jfx:jar
