@@ -5,7 +5,6 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="209.0" prefWidth="389.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="shnulaa.fx.controller.MainLayoutController">
    <children>
       <TabPane layoutX="14.0" prefHeight="205.0" prefWidth="361.0" tabClosingPolicy="UNAVAILABLE">
@@ -30,7 +29,18 @@
                   </Pane>
                </content>
             </Tab>
-          <Tab text="端口监听" />
+          <Tab text="端口监听">
+               <content>
+                  <Pane prefHeight="160.0" prefWidth="361.0">
+                     <children>
+                        <Label layoutX="20.0" layoutY="11.0" text="端口" />
+                        <TextField layoutX="64.0" layoutY="7.0" prefHeight="25.0" prefWidth="53.0" />
+                        <TextArea layoutX="65.0" layoutY="38.0" prefHeight="106.0" prefWidth="283.0" />
+                        <Button layoutX="18.0" layoutY="150.0" mnemonicParsing="false" text="Button" />
+                        <Label layoutX="20.0" layoutY="38.0" text="内容" />
+                     </children>
+                  </Pane>
+               </content></Tab>
         </tabs>
       </TabPane>
    </children>
