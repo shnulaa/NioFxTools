@@ -39,6 +39,7 @@ public class MainGui extends Application {
 
 		Platform.setImplicitExit(false);
 		this.primaryStage = primaryStage;
+		// this.primaryStage.initStyle(StageStyle.UNDECORATED);
 		this.primaryStage.setTitle("Java Fx Nio Port Clone");
 
 		try {
