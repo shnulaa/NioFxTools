@@ -15,14 +15,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 import shnulaa.fx.config.Config;
 import shnulaa.fx.constant.Constant;
 import shnulaa.fx.exception.NioException;
 import shnulaa.fx.message.MessageOutputImpl;
 import shnulaa.fx.pool.Executor;
+import shnulaa.fx.util.Lists;
+import shnulaa.fx.util.Maps;
 
 /**
  * NioServerBase
