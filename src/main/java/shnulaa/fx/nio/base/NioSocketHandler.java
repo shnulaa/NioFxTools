@@ -1,4 +1,4 @@
-package shnulaa.fx.nio;
+package shnulaa.fx.nio.base;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -19,9 +19,11 @@ import shnulaa.fx.config.Config;
 import shnulaa.fx.constant.Constant;
 import shnulaa.fx.exception.NioException;
 import shnulaa.fx.message.MessageOutputImpl;
+import shnulaa.fx.nio.clone.ChangeRequest;
 import shnulaa.fx.pool.Executor;
 import shnulaa.fx.util.Lists;
 import shnulaa.fx.util.Maps;
+import shnulaa.fx.worker.PipeWorker;
 
 /**
  * NioServerBase
@@ -29,10 +31,10 @@ import shnulaa.fx.util.Maps;
  * @author liuyq
  *
  */
-public abstract class NioServerBase implements ISocketHandler, IServer {
+public abstract class NioSocketHandler implements ISocketHandler, IServer {
 
 	/** the instance of log **/
-	private static Logger log = LoggerFactory.getLogger(NioServerBase.class);
+	private static Logger log = LoggerFactory.getLogger(NioSocketHandler.class);
 	protected Selector selector;
 	protected Config config;
 
@@ -54,10 +56,10 @@ public abstract class NioServerBase implements ISocketHandler, IServer {
 
 	protected abstract void stopServer();
 
-	public NioServerBase() {
+	public NioSocketHandler() {
 	}
 
-	public NioServerBase(MessageOutputImpl output, Config config) {
+	public NioSocketHandler(MessageOutputImpl output, Config config) {
 		this();
 		this.config = config;
 		this.messageOutputImpl = output;

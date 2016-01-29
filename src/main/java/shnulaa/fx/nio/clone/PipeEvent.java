@@ -1,4 +1,4 @@
-package shnulaa.fx.nio;
+package shnulaa.fx.nio.clone;
 
 import java.io.Serializable;
 

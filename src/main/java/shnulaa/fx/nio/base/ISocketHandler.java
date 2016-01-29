@@ -1,4 +1,6 @@
-package shnulaa.fx.nio;
+package shnulaa.fx.nio.base;
+
+import shnulaa.fx.nio.clone.ChangeRequest;
 
 /**
  * 

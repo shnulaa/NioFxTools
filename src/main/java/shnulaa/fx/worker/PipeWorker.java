@@ -1,4 +1,4 @@
-package shnulaa.fx.nio;
+package shnulaa.fx.worker;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
@@ -9,6 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import shnulaa.fx.config.Config;
+import shnulaa.fx.nio.base.ISocketHandler;
+import shnulaa.fx.nio.clone.ChangeRequest;
+import shnulaa.fx.nio.clone.LocalSocketHandler;
+import shnulaa.fx.nio.clone.PipeEvent;
 import shnulaa.fx.util.Queues;
 
 /**
@@ -17,7 +21,7 @@ import shnulaa.fx.util.Queues;
  *
  */
 public class PipeWorker implements Runnable {
-	private static Logger log = LoggerFactory.getLogger(LocalClonePortServer.class);
+	private static Logger log = LoggerFactory.getLogger(LocalSocketHandler.class);
 	private ISocketHandler localHandler;
 	private ISocketHandler remoteHandler;
 

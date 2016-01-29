@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package shnulaa.fx.nio;
+package shnulaa.fx.nio.clone;
 
 import java.nio.channels.SocketChannel;
 

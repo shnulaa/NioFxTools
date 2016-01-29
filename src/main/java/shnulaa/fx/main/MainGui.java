@@ -39,7 +39,7 @@ public class MainGui extends Application {
 		Platform.setImplicitExit(false);
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("Java Fx Nio Tools");
-		setUserAgentStylesheet(STYLESHEET_MODENA);
+		setUserAgentStylesheet(STYLESHEET_CASPIAN);
 
 		try {
 			// Load the root layout from the fxml file
@@ -55,8 +55,6 @@ public class MainGui extends Application {
 			this.controller = mainLayoutLoader.getController();
 
 			primaryStage.getIcons().add(new Image(MainGui.class.getResource("/image/icon1.png").toString()));
-			// primaryStage.getIcons().add(new
-			// Image(MainGui.class.getResource("/image/icon2.png").toString()));
 			primaryStage.show();
 		} catch (IOException e) {
 			log.error("IOException occurred when load MainLayout.fxml..", e);

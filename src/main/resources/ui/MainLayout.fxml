@@ -13,10 +13,10 @@
                <content>
                   <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="168.0" prefWidth="349.0">
                      <children>
-                        <Button fx:id="listen" layoutX="14.0" layoutY="149.0" mnemonicParsing="false" onAction="#handleListen" text="克隆" />
+                        <Button fx:id="clone" layoutX="14.0" layoutY="149.0" mnemonicParsing="false" onAction="#handleClone" text="克隆" />
                         <Label fx:id="localIpLab" layoutX="13.0" layoutY="17.0" text="原始地址" />
                         <TextField fx:id="localIp" layoutX="70.0" layoutY="13.0" prefHeight="25.0" prefWidth="73.0" />
-                        <TextArea fx:id="listenArea" layoutX="156.0" layoutY="13.0" prefHeight="124.0" prefWidth="177.0" />
+                        <TextArea fx:id="cloneArea" layoutX="156.0" layoutY="13.0" prefHeight="124.0" prefWidth="177.0" />
                         <Button fx:id="stop" layoutX="63.0" layoutY="149.0" mnemonicParsing="false" onAction="#handleStop" text="停止" />
                         <Button fx:id="clear" layoutX="115.0" layoutY="149.0" mnemonicParsing="false" onAction="#handleClear" text="清空" />
                         <Label fx:id="localPortLab" layoutX="14.0" layoutY="50.0" text="原始端口" />
@@ -34,10 +34,11 @@
                   <Pane prefHeight="160.0" prefWidth="361.0">
                      <children>
                         <Label layoutX="20.0" layoutY="11.0" text="端口" />
-                        <TextField layoutX="64.0" layoutY="7.0" prefHeight="25.0" prefWidth="53.0" />
-                        <TextArea layoutX="65.0" layoutY="38.0" prefHeight="106.0" prefWidth="283.0" />
-                        <Button layoutX="18.0" layoutY="150.0" mnemonicParsing="false" text="Button" />
+                        <TextField fx:id="listenPort" layoutX="64.0" layoutY="7.0" prefHeight="25.0" prefWidth="53.0" />
+                        <TextArea fx:id="listenArea" layoutX="65.0" layoutY="38.0" prefHeight="106.0" prefWidth="283.0" />
+                        <Button fx:id="listen" layoutX="18.0" layoutY="147.0" mnemonicParsing="false" onAction="#handleListen" prefHeight="22.0" prefWidth="52.0" text="监听" />
                         <Label layoutX="20.0" layoutY="38.0" text="内容" />
+                        <Button layoutX="77.0" layoutY="147.0" mnemonicParsing="false" text="Button" />
                      </children>
                   </Pane>
                </content></Tab>

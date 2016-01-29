@@ -1,4 +1,4 @@
-package shnulaa.fx.nio;
+package shnulaa.fx.nio.clone;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -16,26 +16,28 @@ import org.slf4j.LoggerFactory;
 import shnulaa.fx.config.Config;
 import shnulaa.fx.exception.NioException;
 import shnulaa.fx.message.MessageOutputImpl;
+import shnulaa.fx.nio.base.NioSocketHandler;
 import shnulaa.fx.pool.Executor;
 import shnulaa.fx.util.Collections3;
+import shnulaa.fx.worker.PipeWorker;
 
 /**
  * 
  * @author liuyq
  *
  */
-public class LocalClonePortServer extends NioServerBase {
+public class LocalSocketHandler extends NioSocketHandler {
 
-	private static Logger log = LoggerFactory.getLogger(LocalClonePortServer.class);
+	private static Logger log = LoggerFactory.getLogger(LocalSocketHandler.class);
 
 	private ServerSocketChannel server;
-	private RemoteConnectionServer remoteServer;
+	private RemoteSocketHandler remoteServer;
 	private final Executor executor;
 
-	public LocalClonePortServer(MessageOutputImpl output, Config config) {
+	public LocalSocketHandler(MessageOutputImpl output, Config config) {
 		super(output, config);
 		this.executor = Executor.getInstance();
-		this.remoteServer = new RemoteConnectionServer(output, config);
+		this.remoteServer = new RemoteSocketHandler(output, config);
 		this.executor.execute(this.remoteServer);
 	}
 

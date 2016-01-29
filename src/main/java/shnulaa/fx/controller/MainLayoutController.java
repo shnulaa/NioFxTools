@@ -2,6 +2,7 @@ package shnulaa.fx.controller;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -15,8 +16,8 @@ import javafx.scene.control.TextField;
 import shnulaa.fx.config.Config;
 import shnulaa.fx.constant.Constant;
 import shnulaa.fx.message.MessageOutputImpl;
-import shnulaa.fx.nio.IServer;
-import shnulaa.fx.nio.LocalClonePortServer;
+import shnulaa.fx.nio.base.IServer;
+import shnulaa.fx.nio.clone.LocalSocketHandler;
 
 @SuppressWarnings("restriction")
 public class MainLayoutController {
@@ -36,7 +37,7 @@ public class MainLayoutController {
 	private TextField remotePort; // remote port
 
 	@FXML
-	private Button listen; // the clone button
+	private Button clone; // the clone button
 
 	@FXML
 	private Button stop; // stop button
@@ -45,16 +46,30 @@ public class MainLayoutController {
 	private Button clear; // the clear button
 
 	@FXML
+	private TextArea cloneArea;
+
+	@FXML
+	private Button listen; // the listen button
+
+	@FXML
+	private TextField listenPort; // listen port
+
+	@FXML
 	private TextArea listenArea;
 
 	/** the service create a new thread for receive the connection **/
-	private ExecutorService service;
+	private ExecutorService cloneService;
+
+	private ExecutorService listenService;
 
 	/** the worker of local Nio server, use for shutdown the server **/
 	private IServer server;
 
 	/** use for output the message in textArea **/
-	private MessageOutputImpl outputImpl;
+	private MessageOutputImpl cloneOutput;
+
+	/** use for output the message in textArea **/
+	private MessageOutputImpl listenOutput;
 
 	/**
 	 * constructor
@@ -65,7 +80,8 @@ public class MainLayoutController {
 	@FXML
 	private void initialize() {
 		log.debug("Initialize the Controller..");
-		this.outputImpl = new MessageOutputImpl(listenArea);
+		this.cloneOutput = new MessageOutputImpl(cloneArea);
+		this.listenOutput = new MessageOutputImpl(listenArea);
 
 		localIp.setText(Constant.DEFAULT_HOST);
 		localPort.setText(String.valueOf(Constant.DEFAULT_PORT));
@@ -73,7 +89,7 @@ public class MainLayoutController {
 		remoteIp.setText("192.168.1.38");
 		remotePort.setText("22");
 
-		listen.setDisable(false);
+		clone.setDisable(false);
 		stop.setDisable(true);
 	}
 
@@ -81,18 +97,26 @@ public class MainLayoutController {
 	 * the action for handle the button of listen
 	 */
 	@FXML
-	private void handleListen() {
+	private void handleClone() {
 		try {
 			Config config = createConfig();
 			if (config == null) {
 				throw new RuntimeException("");
 			}
-			service = Executors.newSingleThreadExecutor();
+			cloneService = Executors.newSingleThreadExecutor(new ThreadFactory() {
+				@Override
+				public Thread newThread(Runnable r) {
+					Thread t = new Thread(r);
+					t.setDaemon(true);
+					t.setName("Clone-Port-Thread");
+					return t;
+				}
+			});
 
-			server = new LocalClonePortServer(outputImpl, config);
-			service.execute(server);
+			server = new LocalSocketHandler(cloneOutput, config);
+			cloneService.execute(server);
 
-			listen.setDisable(true);
+			clone.setDisable(true);
 			stop.setDisable(false);
 
 		} catch (Exception ex) {
@@ -101,7 +125,7 @@ public class MainLayoutController {
 					Alert.AlertType.ERROR);
 			return;
 		}
-		outputImpl.output("Clone port successfully..", true);
+		cloneOutput.output("Clone port successfully..", true);
 	}
 
 	/**
@@ -113,39 +137,31 @@ public class MainLayoutController {
 	}
 
 	/**
-	 * stop
-	 */
-	public void stop() {
-		try {
-			log.debug("Read to Shutdown the service..");
-			if (server != null) {
-				server.stop();
-			}
-
-			if (service != null) {
-				service.shutdown();
-			}
-			outputImpl.output("Shutdown service successfully..", true);
-
-			listen.setDisable(false);
-			stop.setDisable(true);
-
-			log.debug("Shutdown the service successfully..");
-		} catch (Exception ex) {
-			log.error("Exception occurred when handleStop", ex);
-		} finally {
-		}
-	}
-
-	/**
 	 * the action for handle the button of clear
 	 */
 	@FXML
 	private void handleClear() {
-		if (listenArea != null) {
+		if (cloneArea != null) {
 			log.debug("Clear the information in textarea..");
-			listenArea.clear();
+			cloneArea.clear();
 		}
+	}
+
+	@FXML
+	private void handleListen() {
+
+		listenService = Executors.newSingleThreadExecutor(new ThreadFactory() {
+			@Override
+			public Thread newThread(Runnable r) {
+				Thread t = new Thread(r);
+				t.setDaemon(true);
+				t.setName("Listen-Port-Thread");
+				return t;
+			}
+		});
+		
+		
+
 	}
 
 	/**
@@ -161,6 +177,31 @@ public class MainLayoutController {
 		a.setResizable(false);
 		a.setContentText(message);
 		a.showAndWait();
+	}
+
+	/**
+	 * stop
+	 */
+	public void stop() {
+		try {
+			log.debug("Read to Shutdown the service..");
+			if (server != null) {
+				server.stop();
+			}
+
+			if (cloneService != null) {
+				cloneService.shutdown();
+			}
+			cloneOutput.output("Shutdown service successfully..", true);
+
+			clone.setDisable(false);
+			stop.setDisable(true);
+
+			log.debug("Shutdown the service successfully..");
+		} catch (Exception ex) {
+			log.error("Exception occurred when handleStop", ex);
+		} finally {
+		}
 	}
 
 	/**

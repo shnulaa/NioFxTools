@@ -1,4 +1,4 @@
-package shnulaa.fx.nio;
+package shnulaa.fx.nio.clone;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -15,17 +15,20 @@ import org.slf4j.LoggerFactory;
 import shnulaa.fx.config.Config;
 import shnulaa.fx.exception.NioException;
 import shnulaa.fx.message.MessageOutputImpl;
+import shnulaa.fx.nio.base.ISocketHandler;
+import shnulaa.fx.nio.base.NioSocketHandler;
 import shnulaa.fx.util.Collections3;
+import shnulaa.fx.worker.PipeWorker;
 
 /**
  * 
  * @author liuyq
  *
  */
-public class RemoteConnectionServer extends NioServerBase {
-	private static Logger log = LoggerFactory.getLogger(RemoteConnectionServer.class);
+public class RemoteSocketHandler extends NioSocketHandler {
+	private static Logger log = LoggerFactory.getLogger(RemoteSocketHandler.class);
 
-	public RemoteConnectionServer(MessageOutputImpl output, Config config) {
+	public RemoteSocketHandler(MessageOutputImpl output, Config config) {
 		super(output, config);
 	}
 
