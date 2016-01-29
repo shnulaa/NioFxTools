@@ -101,7 +101,7 @@ public class MainLayoutController {
 		try {
 			Config config = createConfig();
 			if (config == null) {
-				throw new RuntimeException("");
+				throw new RuntimeException("input is incorrect..");
 			}
 			cloneService = Executors.newSingleThreadExecutor(new ThreadFactory() {
 				@Override
@@ -159,8 +159,6 @@ public class MainLayoutController {
 				return t;
 			}
 		});
-		
-		
 
 	}
 
