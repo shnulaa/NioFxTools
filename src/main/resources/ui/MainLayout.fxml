@@ -38,7 +38,7 @@
                         <TextArea fx:id="listenArea" layoutX="65.0" layoutY="38.0" prefHeight="106.0" prefWidth="283.0" />
                         <Button fx:id="listen" layoutX="18.0" layoutY="147.0" mnemonicParsing="false" onAction="#handleListen" prefHeight="22.0" prefWidth="52.0" text="监听" />
                         <Label layoutX="20.0" layoutY="38.0" text="内容" />
-                        <Button layoutX="77.0" layoutY="147.0" mnemonicParsing="false" text="Button" />
+                        <Button layoutX="77.0" layoutY="147.0" mnemonicParsing="false" text="关闭" />
                      </children>
                   </Pane>
                </content></Tab>
