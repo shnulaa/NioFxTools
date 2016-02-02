@@ -53,6 +53,9 @@ public class MainLayoutController {
 	private Button listen; // the listen button
 
 	@FXML
+	private Button stopListen;
+
+	@FXML
 	private TextField listenPort; // listen port
 
 	@FXML
@@ -93,8 +96,13 @@ public class MainLayoutController {
 		remoteIp.setText("192.168.1.38");
 		remotePort.setText("22");
 
+		listenPort.setText("1234");
+
 		clone.setDisable(false);
 		stop.setDisable(true);
+
+		listen.setDisable(false);
+		stopListen.setDisable(true);
 	}
 
 	/**
@@ -170,12 +178,25 @@ public class MainLayoutController {
 				return;
 			}
 
-			listenServer = new ListenSocketHandler(listenOutput, new Config(Integer.valueOf(portTxt)));
+			int port = Integer.valueOf(portTxt);
+
+			listenServer = new ListenSocketHandler(listenOutput, new Config(port));
 			listenService.submit(listenServer);
+
+			listen.setDisable(true);
+			stopListen.setDisable(false);
+			listenOutput.output("listen port " + portTxt + " successfully..", true);
 		} catch (Exception ex) {
 			log.error("Exception occurred when Listen a port..");
-
+			showAlert(Constant.TITLE, (ex instanceof NumberFormatException) ? "Port is not number.." : ex.getMessage(),
+					Alert.AlertType.ERROR);
+			return;
 		}
+	}
+
+	@FXML
+	private void handleStopListen() {
+		stopListen();
 	}
 
 	/**
@@ -191,6 +212,29 @@ public class MainLayoutController {
 		a.setResizable(false);
 		a.setContentText(message);
 		a.showAndWait();
+	}
+
+	public void stopListen() {
+		try {
+			log.debug("Read to Shutdown the service..");
+			if (listenServer != null) {
+				listenServer.stop();
+			}
+
+			if (listenService != null) {
+				listenService.shutdown();
+			}
+
+			listenOutput.output("Close port successfully..", true);
+
+			listen.setDisable(false);
+			stopListen.setDisable(true);
+
+			log.debug("Shutdown the service successfully..");
+		} catch (Exception ex) {
+			log.error("Exception occurred when handleStop", ex);
+		} finally {
+		}
 	}
 
 	/**

@@ -48,6 +48,7 @@ public class PipeWorker implements Runnable {
 	}
 
 	public PipeWorker() {
+		this.progressQueue = Queues.newLinkedBlockingQueue();
 	}
 
 	@Override

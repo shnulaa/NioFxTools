@@ -87,7 +87,7 @@ public class MainGui extends Application {
 				}
 			});
 
-			java.awt.MenuItem openItem = new java.awt.MenuItem("Configuration");
+			java.awt.MenuItem openItem = new java.awt.MenuItem("Display");
 			openItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -105,6 +105,7 @@ public class MainGui extends Application {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					controller.stop();
+					controller.stopListen();
 					Platform.exit();
 					tray.remove(trayIcon);
 				}
