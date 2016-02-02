@@ -1,28 +1,41 @@
 package shnulaa.fx.nio.listen;
 
 import java.io.IOException;
-import java.nio.channels.AcceptPendingException;
+import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import shnulaa.fx.config.Config;
 import shnulaa.fx.exception.NioException;
+import shnulaa.fx.message.MessageOutputImpl;
 import shnulaa.fx.nio.base.NioSocketHandler;
 import shnulaa.fx.nio.clone.ChangeRequest;
 
+/**
+ * 
+ * @author liuyq
+ *
+ */
 public class ListenSocketHandler extends NioSocketHandler {
 
 	private static Logger log = LoggerFactory.getLogger(ListenSocketHandler.class);
 	private ServerSocketChannel server;
 
+	public ListenSocketHandler(MessageOutputImpl output, Config config) {
+		super(output, config);
+	}
+
 	@Override
 	protected Selector initSelector() {
 		try {
 			server = SelectorProvider.provider().openServerSocketChannel();
+			server.bind(new InetSocketAddress(config.getListenPort()));
 			server.configureBlocking(false);
 			Selector selector = SelectorProvider.provider().openSelector();
 			server.register(selector, SelectionKey.OP_ACCEPT);
@@ -40,36 +53,77 @@ public class ListenSocketHandler extends NioSocketHandler {
 	@Override
 	protected void progressKey(SelectionKey key) throws IOException {
 		if (key.isAcceptable()) {
-			log.info("");
+			accept(key);
 		} else if (key.isReadable()) {
-
+			read(key);
 		} else if (key.isWritable()) {
-
+			write(key);
+		} else {
+			log.info("progressKey key:{}.", key);
 		}
 	}
 
-	private void accept(SelectionKey key)  {
+	private void accept(SelectionKey key) {
+		SocketChannel sc = null;
 		try {
+			log.info("accept key..");
 			ServerSocketChannel channel = (ServerSocketChannel) key.channel();
-			channel.accept();
-			
-			
-			
+			sc = (SocketChannel) channel.accept();
+			sc.configureBlocking(false);
+			sc.register(selector, SelectionKey.OP_READ);
 		} catch (IOException ex) {
-			
+			if (sc != null) {
+				cleanUp(sc);
+			}
 		}
-
-
 	}
 
 	private void read(SelectionKey key) {
+		SocketChannel sc = null;
+		try {
+			sc = (SocketChannel) key.channel();
 
+			readBuffer.clear();
+
+			int readCount = sc.read(readBuffer);
+			if (readCount < 0) {
+				cleanUp(sc);
+				return;
+			}
+
+			String message = decode(readBuffer, true);
+			log.info(message);
+			messageOutputImpl.output(message);
+			sc.register(selector, SelectionKey.OP_WRITE);
+
+		} catch (IOException ex) {
+			if (sc != null) {
+				cleanUp(sc);
+			}
+		}
+	}
+
+	private void write(SelectionKey key) {
+		SocketChannel sc = null;
+		try {
+			log.info("Writable key..");
+			sc = (SocketChannel) key.channel();
+			sc.register(selector, SelectionKey.OP_READ);
+		} catch (IOException ex) {
+			if (sc != null) {
+				cleanUp(sc);
+			}
+		}
 	}
 
 	@Override
 	protected void stopServer() {
-		// TODO Auto-generated method stub
-
+		if (server != null) {
+			try {
+				server.close();
+			} catch (IOException e) {
+				log.error("IOException occurred when close the ServerSocketChannel..", e);
+			}
+		}
 	}
-
 }

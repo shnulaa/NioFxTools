@@ -138,15 +138,7 @@ public abstract class NioSocketHandler implements ISocketHandler, IServer {
 	protected byte[] decode(ByteBuffer readBuffer) {
 		try {
 			readBuffer.flip(); // flip the buffer for reading
-			byte[] bytes = new byte[readBuffer.remaining()]; // create a byte
-																// array
-																// the length of
-																// the
-																// number of
-																// bytes
-																// written to
-																// the
-																// buffer
+			byte[] bytes = new byte[readBuffer.remaining()];
 			readBuffer.get(bytes); // read the bytes that were written
 			return bytes;
 		} catch (Exception ex) {

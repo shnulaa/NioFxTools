@@ -18,6 +18,7 @@ import shnulaa.fx.constant.Constant;
 import shnulaa.fx.message.MessageOutputImpl;
 import shnulaa.fx.nio.base.IServer;
 import shnulaa.fx.nio.clone.LocalSocketHandler;
+import shnulaa.fx.nio.listen.ListenSocketHandler;
 
 @SuppressWarnings("restriction")
 public class MainLayoutController {
@@ -63,7 +64,10 @@ public class MainLayoutController {
 	private ExecutorService listenService;
 
 	/** the worker of local Nio server, use for shutdown the server **/
-	private IServer server;
+	private IServer cloneServer;
+
+	/** the worker of local Nio server, use for shutdown the server **/
+	private IServer listenServer;
 
 	/** use for output the message in textArea **/
 	private MessageOutputImpl cloneOutput;
@@ -113,8 +117,8 @@ public class MainLayoutController {
 				}
 			});
 
-			server = new LocalSocketHandler(cloneOutput, config);
-			cloneService.execute(server);
+			cloneServer = new LocalSocketHandler(cloneOutput, config);
+			cloneService.execute(cloneServer);
 
 			clone.setDisable(true);
 			stop.setDisable(false);
@@ -149,17 +153,29 @@ public class MainLayoutController {
 
 	@FXML
 	private void handleListen() {
+		try {
+			listenService = Executors.newSingleThreadExecutor(new ThreadFactory() {
+				@Override
+				public Thread newThread(Runnable r) {
+					Thread t = new Thread(r);
+					t.setDaemon(true);
+					t.setName("Listen-Port-Thread");
+					return t;
+				}
+			});
 
-		listenService = Executors.newSingleThreadExecutor(new ThreadFactory() {
-			@Override
-			public Thread newThread(Runnable r) {
-				Thread t = new Thread(r);
-				t.setDaemon(true);
-				t.setName("Listen-Port-Thread");
-				return t;
+			String portTxt = listenPort.getText();
+			if (StringUtils.isEmpty(portTxt)) {
+				showAlert(Constant.TITLE, "Port must be specified..", Alert.AlertType.ERROR);
+				return;
 			}
-		});
 
+			listenServer = new ListenSocketHandler(listenOutput, new Config(Integer.valueOf(portTxt)));
+			listenService.submit(listenServer);
+		} catch (Exception ex) {
+			log.error("Exception occurred when Listen a port..");
+
+		}
 	}
 
 	/**
@@ -183,8 +199,8 @@ public class MainLayoutController {
 	public void stop() {
 		try {
 			log.debug("Read to Shutdown the service..");
-			if (server != null) {
-				server.stop();
+			if (cloneServer != null) {
+				cloneServer.stop();
 			}
 
 			if (cloneService != null) {

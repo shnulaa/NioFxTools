@@ -29,11 +29,17 @@ public class Config implements Serializable {
 		this.remotePort = clonePort;
 	}
 
+	public Config(int listenPort) {
+		this.listenPort = listenPort;
+	}
+
 	private String localIp;
 	private int localPort;
 
 	private String remoteIp;
 	private int remotePort;
+
+	private int listenPort;
 
 	public String getLocalIp() {
 		return localIp;
@@ -65,6 +71,14 @@ public class Config implements Serializable {
 
 	public void setRemotePort(int remotePort) {
 		this.remotePort = remotePort;
+	}
+
+	public int getListenPort() {
+		return listenPort;
+	}
+
+	public void setListenPort(int listenPort) {
+		this.listenPort = listenPort;
 	}
 
 }
