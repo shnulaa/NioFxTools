@@ -2,11 +2,13 @@ package shnulaa.fx.nio.listen;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,8 @@ import shnulaa.fx.exception.NioException;
 import shnulaa.fx.message.MessageOutputImpl;
 import shnulaa.fx.nio.base.NioSocketHandler;
 import shnulaa.fx.nio.clone.ChangeRequest;
+import shnulaa.fx.util.Collections3;
+import shnulaa.fx.util.Lists;
 import shnulaa.fx.worker.PipeWorker;
 
 /**
@@ -48,7 +52,19 @@ public class ListenSocketHandler extends NioSocketHandler {
 
 	@Override
 	protected boolean progressRequest(ChangeRequest changeRequest) throws IOException {
-		return false;
+		switch (changeRequest.type) {
+		case ChangeRequest.CHANGE_SOCKET_OP:
+			SelectionKey key = changeRequest.socket.keyFor(selector);
+			key.interestOps(changeRequest.op);
+			break;
+		case ChangeRequest.CLOSE_CHANNEL:
+			cleanUp(changeRequest.socket);
+			break;
+		default:
+			log.error("change request type is not support..");
+			break;
+		}
+		return true;
 	}
 
 	@Override
@@ -74,6 +90,15 @@ public class ListenSocketHandler extends NioSocketHandler {
 			sc.configureBlocking(false);
 			sc.register(selector, SelectionKey.OP_READ);
 
+			if (!pendingData.containsKey(sc)) {
+				pendingData.put(sc, Lists.newArrayList());
+				messageOutputImpl.accept(sc);
+			}
+
+			if (!historyData.containsKey(sc)) {
+				historyData.put(sc, new StringBuffer());
+			}
+
 			pipes.put(sc, new PipeWorker(this, null, sc, null, config));
 		} catch (IOException ex) {
 			log.error("IOException occurred when accept.", ex);
@@ -96,9 +121,12 @@ public class ListenSocketHandler extends NioSocketHandler {
 				return;
 			}
 
-			String message = decode(readBuffer, true);
+			String message = decode(readBuffer, false);
 			log.info(message);
 			messageOutputImpl.output(message);
+
+			addHistory(sc, message);
+
 			sc.register(selector, SelectionKey.OP_WRITE);
 
 		} catch (IOException ex) {
@@ -115,10 +143,26 @@ public class ListenSocketHandler extends NioSocketHandler {
 			log.info("Writable key..");
 			sc = (SocketChannel) key.channel();
 
-			// sc.write(ByteBuffer.wrap("HTTP/1.1 200 OK\nContent-Type:
-			// text/html; charset=UTF-8".getBytes("UTF-8")));
+			List<ByteBuffer> queue = pendingData.get(sc);
+			if (queue != null) {
+				synchronized (queue) {
+					while (!queue.isEmpty()) {
+						ByteBuffer buffer = Collections3.getFirst(queue);
+						sc.write(buffer);
+						// log.info(decode(buffer, true));
+						if (buffer.hasRemaining()) {
+							break;
+						}
+						queue.remove(buffer);
+					}
+					if (queue.isEmpty()) {
+						key.interestOps(SelectionKey.OP_READ);
+					}
+				}
+			} else {
+				log.warn("queue is null while write the ByteBuffer to channel..");
+			}
 
-			sc.register(selector, SelectionKey.OP_READ);
 		} catch (IOException ex) {
 			log.error("IOException occurred when write.", ex);
 			if (sc != null) {

@@ -43,6 +43,8 @@ public abstract class NioSocketHandler implements ISocketHandler, IServer {
 
 	protected Map<SocketChannel, List<ByteBuffer>> pendingData = Maps.newConcurrentMap();
 
+	protected Map<SocketChannel, StringBuffer> historyData = Maps.newConcurrentMap();
+
 	protected List<ChangeRequest> pendingRequests = Lists.newArrayList();
 
 	protected Map<SocketChannel, PipeWorker> pipes = Maps.newConcurrentMap();
@@ -209,6 +211,20 @@ public abstract class NioSocketHandler implements ISocketHandler, IServer {
 	@Override
 	public void send(ChangeRequest request) {
 
+	}
+
+	protected void addHistory(SocketChannel sc, String message) {
+		StringBuffer history = historyData.get(sc);
+		if (history != null) {
+			history.append(message);
+		} else {
+			log.warn("save history failed..");
+		}
+	}
+
+	public String getHistory(SocketChannel sc) {
+		StringBuffer history = historyData.get(sc);
+		return (history != null) ? history.toString() : "No history!!";
 	}
 
 }

@@ -11,12 +11,15 @@ import org.slf4j.LoggerFactory;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import shnulaa.fx.config.Config;
 import shnulaa.fx.constant.Constant;
 import shnulaa.fx.message.MessageOutputImpl;
+import shnulaa.fx.message.MessageOutputImpl.KeyValuePair;
 import shnulaa.fx.nio.base.IServer;
+import shnulaa.fx.nio.base.ISocketHandler;
 import shnulaa.fx.nio.clone.LocalSocketHandler;
 import shnulaa.fx.nio.listen.ListenSocketHandler;
 
@@ -61,6 +64,9 @@ public class MainLayoutController {
 	@FXML
 	private TextArea listenArea;
 
+	@FXML
+	private ChoiceBox<KeyValuePair> channelBox;
+
 	/** the service create a new thread for receive the connection **/
 	private ExecutorService cloneService;
 
@@ -88,7 +94,7 @@ public class MainLayoutController {
 	private void initialize() {
 		log.debug("Initialize the Controller..");
 		this.cloneOutput = new MessageOutputImpl(cloneArea);
-		this.listenOutput = new MessageOutputImpl(listenArea);
+		this.listenOutput = new MessageOutputImpl(listenArea, channelBox);
 
 		localIp.setText(Constant.DEFAULT_HOST);
 		localPort.setText(String.valueOf(Constant.DEFAULT_PORT));
@@ -103,6 +109,7 @@ public class MainLayoutController {
 
 		listen.setDisable(false);
 		stopListen.setDisable(true);
+
 	}
 
 	/**
@@ -181,6 +188,7 @@ public class MainLayoutController {
 			int port = Integer.valueOf(portTxt);
 
 			listenServer = new ListenSocketHandler(listenOutput, new Config(port));
+			listenOutput.setHandler((ISocketHandler) listenServer);
 			listenService.submit(listenServer);
 
 			listen.setDisable(true);
