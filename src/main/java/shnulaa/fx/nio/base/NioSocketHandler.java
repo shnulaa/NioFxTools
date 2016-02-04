@@ -20,7 +20,6 @@ import shnulaa.fx.constant.Constant;
 import shnulaa.fx.exception.NioException;
 import shnulaa.fx.message.MessageOutputImpl;
 import shnulaa.fx.nio.clone.ChangeRequest;
-import shnulaa.fx.pool.Executor;
 import shnulaa.fx.util.Lists;
 import shnulaa.fx.util.Maps;
 import shnulaa.fx.worker.PipeWorker;
@@ -177,8 +176,6 @@ public abstract class NioSocketHandler implements ISocketHandler, IServer {
 		} catch (IOException e) {
 			log.error("IOException occurred when close the selector..");
 		}
-
-		Executor.getInstance().stopInternal();
 
 		stopServer();
 	}

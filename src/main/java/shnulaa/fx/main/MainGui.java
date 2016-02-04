@@ -20,6 +20,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import shnulaa.fx.controller.MainLayoutController;
+import shnulaa.fx.pool.Executor;
 
 @SuppressWarnings("restriction")
 public class MainGui extends Application {
@@ -106,6 +107,7 @@ public class MainGui extends Application {
 				public void actionPerformed(ActionEvent e) {
 					controller.stop();
 					controller.stopListen();
+					Executor.getInstance().stopInternal();
 					Platform.exit();
 					tray.remove(trayIcon);
 				}

@@ -2,7 +2,6 @@ package shnulaa.fx.nio.listen;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -116,7 +115,8 @@ public class ListenSocketHandler extends NioSocketHandler {
 			log.info("Writable key..");
 			sc = (SocketChannel) key.channel();
 
-			sc.write(ByteBuffer.wrap("HTTP/1.1 200 OK\n\n12121212121212".getBytes()));
+			// sc.write(ByteBuffer.wrap("HTTP/1.1 200 OK\nContent-Type:
+			// text/html; charset=UTF-8".getBytes("UTF-8")));
 
 			sc.register(selector, SelectionKey.OP_READ);
 		} catch (IOException ex) {
