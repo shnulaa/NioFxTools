@@ -68,7 +68,6 @@ public class MessageOutputImpl {
 				} else {
 					channelBox.getItems().remove(item);
 				}
-
 			}
 		});
 	}

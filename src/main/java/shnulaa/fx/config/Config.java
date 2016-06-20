@@ -23,6 +23,7 @@ public class Config implements Serializable {
 	 * @param clonePort
 	 */
 	public Config(String localIp, int localPort, String cloneIp, int clonePort) {
+		
 		this.localIp = localIp;
 		this.localPort = localPort;
 		this.remoteIp = cloneIp;

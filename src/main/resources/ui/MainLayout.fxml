@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="213.0" prefWidth="363.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="shnulaa.fx.controller.MainLayoutController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="214.0" prefWidth="364.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="shnulaa.fx.controller.MainLayoutController">
    <children>
       <TabPane layoutX="14.0" prefHeight="205.0" prefWidth="345.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
@@ -31,7 +31,7 @@
             </Tab>
           <Tab text="端口监听">
                <content>
-                  <Pane prefHeight="176.0" prefWidth="376.0">
+                  <Pane prefHeight="176.0" prefWidth="369.0">
                      <children>
                         <Label layoutX="5.0" layoutY="11.0" text="端口" />
                         <TextField fx:id="listenPort" layoutX="49.0" layoutY="7.0" prefHeight="25.0" prefWidth="60.0" />
