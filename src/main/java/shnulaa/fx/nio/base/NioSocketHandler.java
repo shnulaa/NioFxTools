@@ -84,7 +84,11 @@ public abstract class NioSocketHandler implements ISocketHandler, IServer {
 					}
 				}
 
-				selector.select();
+				int num = selector.select();
+				if (num < 0) {
+					log.warn("");
+					continue;
+				}
 
 				Iterator<SelectionKey> it = selector.selectedKeys().iterator();
 				while (it.hasNext()) {

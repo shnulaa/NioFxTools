@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -65,6 +66,9 @@ public class MainLayoutController {
 	private TextArea listenArea;
 
 	@FXML
+	private CheckBox bindshell;
+
+	@FXML
 	private ChoiceBox<KeyValuePair> channelBox;
 
 	/** the service create a new thread for receive the connection **/
@@ -109,6 +113,9 @@ public class MainLayoutController {
 
 		listen.setDisable(false);
 		stopListen.setDisable(true);
+
+		// final KeyValuePair item = new KeyValuePair(null, " ");
+		// this.channelBox.getItems().add(item);
 
 	}
 
@@ -187,7 +194,7 @@ public class MainLayoutController {
 
 			int port = Integer.valueOf(portTxt);
 
-			listenServer = new ListenSocketHandler(listenOutput, new Config(port));
+			listenServer = new ListenSocketHandler(listenOutput, new Config(port, bindshell.isSelected()));
 			listenOutput.setHandler((ISocketHandler) listenServer);
 			listenService.submit(listenServer);
 
@@ -237,7 +244,16 @@ public class MainLayoutController {
 
 			listen.setDisable(false);
 			stopListen.setDisable(true);
-
+			//
+			// try {
+			// // if (!channelBox.getSelectionModel().isEmpty()) {
+			// // channelBox.getSelectionModel().clearSelection();
+			// channelBox.getItems().clear();
+			// // }
+			//
+			// } catch (Exception sex) {
+			// log.error("Exception occurred when clearSelection");
+			// }
 			log.debug("Shutdown the service successfully..");
 		} catch (Exception ex) {
 			log.error("Exception occurred when handleStop", ex);

@@ -35,13 +35,28 @@
                      <children>
                         <Label layoutX="5.0" layoutY="11.0" text="端口" />
                         <TextField fx:id="listenPort" layoutX="49.0" layoutY="7.0" prefHeight="25.0" prefWidth="60.0" />
-                        <TextArea fx:id="listenArea" layoutX="3.0" layoutY="38.0" prefHeight="106.0" prefWidth="336.0" />
+                        <TextArea fx:id="listenArea" layoutX="3.0" layoutY="62.0" prefHeight="82.0" prefWidth="336.0" />
                         <Button fx:id="listen" layoutX="9.0" layoutY="147.0" mnemonicParsing="false" onAction="#handleListen" prefHeight="22.0" prefWidth="52.0" text="监听" />
                         <Button fx:id="stopListen" layoutX="68.0" layoutY="147.0" mnemonicParsing="false" onAction="#handleStopListen" text="关闭" />
                         <ChoiceBox fx:id="channelBox" layoutX="122.0" layoutY="7.0" prefHeight="25.0" prefWidth="216.0" />
+                        <CheckBox id="bindshell" layoutX="9.0" layoutY="39.0" mnemonicParsing="false" text="绑定shell" />
                      </children>
                   </Pane>
                </content></Tab>
+            <Tab text="端口绑定">
+               <content>
+                  <Pane prefHeight="176.0" prefWidth="369.0">
+                     <children>
+                        <Label layoutX="5.0" layoutY="11.0" text="端口" />
+                        <TextField fx:id="listenPort1" layoutX="49.0" layoutY="7.0" prefHeight="25.0" prefWidth="60.0" />
+                        <TextArea fx:id="listenArea1" layoutX="3.0" layoutY="38.0" prefHeight="106.0" prefWidth="336.0" />
+                        <Button fx:id="listen1" layoutX="9.0" layoutY="147.0" mnemonicParsing="false" onAction="#handleListen" prefHeight="22.0" prefWidth="52.0" text="监听" />
+                        <Button fx:id="stopListen1" layoutX="68.0" layoutY="147.0" mnemonicParsing="false" onAction="#handleStopListen" text="关闭" />
+                        <ChoiceBox fx:id="channelBox1" layoutX="122.0" layoutY="7.0" prefHeight="25.0" prefWidth="216.0" />
+                     </children>
+                  </Pane>
+               </content>
+            </Tab>
         </tabs>
       </TabPane>
    </children>

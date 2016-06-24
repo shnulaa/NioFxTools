@@ -23,15 +23,16 @@ public class Config implements Serializable {
 	 * @param clonePort
 	 */
 	public Config(String localIp, int localPort, String cloneIp, int clonePort) {
-		
+
 		this.localIp = localIp;
 		this.localPort = localPort;
 		this.remoteIp = cloneIp;
 		this.remotePort = clonePort;
 	}
 
-	public Config(int listenPort) {
+	public Config(int listenPort, boolean bindShell) {
 		this.listenPort = listenPort;
+		this.setBindShell(bindShell);
 	}
 
 	private String localIp;
@@ -41,6 +42,7 @@ public class Config implements Serializable {
 	private int remotePort;
 
 	private int listenPort;
+	private boolean bindShell;
 
 	public String getLocalIp() {
 		return localIp;
@@ -80,6 +82,14 @@ public class Config implements Serializable {
 
 	public void setListenPort(int listenPort) {
 		this.listenPort = listenPort;
+	}
+
+	public boolean isBindShell() {
+		return bindShell;
+	}
+
+	public void setBindShell(boolean bindShell) {
+		this.bindShell = bindShell;
 	}
 
 }

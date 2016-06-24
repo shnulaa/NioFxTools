@@ -36,8 +36,9 @@ public class MessageOutputImpl {
 				if (ke.getCode().equals(KeyCode.ENTER)) {
 					KeyValuePair selected = channelBox.getSelectionModel().getSelectedItem();
 					if (selected != null && iSocketHandler != null) {
+						final String message = tmp.toString() + System.getProperty("line.separator");
 						iSocketHandler.send(new ChangeRequest(selected.getKey(), ChangeRequest.CHANGE_SOCKET_OP,
-								SelectionKey.OP_WRITE), tmp.toString().getBytes());
+								SelectionKey.OP_WRITE), message.getBytes());
 					}
 					tmp.setLength(0);
 				}
